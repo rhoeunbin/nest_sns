@@ -1,4 +1,11 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 /**
@@ -73,6 +80,25 @@ export class PostsController {
 
   // 3) POST /posts
   // post 생성
+  @Post()
+  postPosts(
+    @Body('author') author: string,
+    @Body('title') title: string,
+    @Body('content') content: string,
+  ) {
+    const post = {
+      id: posts[posts.length - 1].id + 1,
+      author,
+      title,
+      content,
+      likeCount: 0,
+      commentCount: 0,
+    };
+
+    posts = [...posts, post];
+
+    return post;
+  }
 
   // 4) Patch /posts/:id
   // id에 해당되는 post 변경
