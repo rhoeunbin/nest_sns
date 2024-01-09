@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -70,7 +71,10 @@ export class PostsController {
   @Get(':id')
   getPost(@Param('id') id: string) {
     // 파라미터에서 가져올 이름은 id다
+    // id에 해당하는 post 없을 경우 에러 처리
     const post = posts.find((post) => post.id === +id);
+    // post.id는 숫자이기 때문에 id가 아닌 +id인 숫자로 변경해줘야함!
+    // 위에서 id: string이라고 지정
 
     if (!post) {
       throw new NotFoundException(); // nestjs에서 기본으로 제공하는 error type
@@ -135,4 +139,16 @@ export class PostsController {
 
   // 5) DELETE /posts/:id
   // id에 해당되는 post 삭제
+  @Delete(':id')
+  deletePost(@Param('id') id: string) {
+    // id에 해당하는 post 없을 경우 에러 처리
+    const post = posts.find((post) => post.id === +id);
+
+    if (!post) {
+      throw new NotFoundException(); // nestjs에서 기본으로 제공하는 error type
+    }
+    posts = posts.filter((post) => post.id !== +id);
+
+    return id;
+  }
 }
