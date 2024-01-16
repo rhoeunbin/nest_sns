@@ -18,5 +18,5 @@ export class PostsModel {
   likeCount: number;
 
   @Column()
-  commnetCount: number;
+  commentCount: number;
 }
