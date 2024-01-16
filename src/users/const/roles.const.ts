@@ -1,6 +1,6 @@
 export enum RolesEnum {
   // 관리자
-  USER = 'user',
+  USER = 'USER',
   // 사용자
-  ADMIN = 'admin',
+  ADMIN = 'ADMIN',
 }
