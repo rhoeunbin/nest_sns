@@ -1,5 +1,7 @@
 # dependencies
 node_modules/
+dist/*
+*.log
 
 # IDE
 /.idea
@@ -45,3 +47,4 @@ build/config\.gypi
 
 .npmrc
 pnpm-lock.yaml
+postgres-data
