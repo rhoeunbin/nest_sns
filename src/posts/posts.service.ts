@@ -1,4 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PostsModel } from './entities/posts.entity';
 
 /**
  * author: string
@@ -46,41 +49,65 @@ let posts: PostModel[] = [
 
 @Injectable()
 export class PostsService {
-  getAllPosts() {
-    return posts;
+  constructor(
+    // typeorm으로부터 주입받은 모델이다라는 의미로 @InjectRepository 사용
+    @InjectRepository(PostsModel)
+    private readonly postsRepository: Repository<PostModel>,
+    // postsRepository라는 파라미터 생성: 타입<모델이름>
+  ) {}
+
+  // Find 함수로 다수의 데이터 가져오기
+  async getAllPosts() {
+    return this.postsRepository.find();
   }
 
-  getPostById(id: number) {
-    // 파라미터에서 가져올 이름은 id다
-    // id에 해당하는 post 없을 경우 에러 처리
-    const post = posts.find((post) => post.id === +id);
-    // post.id는 숫자이기 때문에 id가 아닌 +id인 숫자로 변경해줘야함!
-    // 위에서 id: string이라고 지정
+  // FindOne 함수 이용해서 하나의 데이터만 찾기
+  async getPostById(id: number) {
+    const post = await this.postsRepository.findOne({
+      where: {
+        id,
+      },
+    });
 
     if (!post) {
-      throw new NotFoundException(); // nestjs에서 기본으로 제공하는 error type
+      throw new NotFoundException();
     }
 
     return post;
   }
 
-  createPost(author: string, title: string, content: string) {
-    const post = {
-      id: posts[posts.length - 1].id + 1,
+  async createPost(author: string, title: string, content: string) {
+    // 1) create -> 저장할 객체 생성
+    // 2) save -> 객체 저장 (create 매서드에서 생성한 객체로)
+
+    const post = this.postsRepository.create({
       author,
       title,
       content,
       likeCount: 0,
       commentCount: 0,
-    };
+    });
 
-    posts = [...posts, post];
+    const newPost = await this.postsRepository.save(post);
 
-    return post;
+    return newPost;
   }
 
-  updatePost(postId: number, author: string, title: string, content: string) {
-    const post = posts.find((post) => post.id === postId);
+  async updatePost(
+    postId: number,
+    author: string,
+    title: string,
+    content: string,
+  ) {
+    // save의 기능
+    // 1. 만약에 데이터가 존재하지 않는다면 (id 기준으로) 새로 생성
+    // 2. 만약에 데이터가 존재한다면 (같은 id의 값이 존재한다면) 존재하던 값을 업데이트함
+
+    const post = await this.postsRepository.findOne({
+      where: {
+        id: postId,
+      },
+    });
 
     if (!post) {
       throw new NotFoundException();
@@ -98,19 +125,24 @@ export class PostsService {
       post.content = content;
     }
 
-    posts = posts.map((prevPost) => (prevPost.id === postId ? post : prevPost));
+    const newPost = await this.postsRepository.save(post);
 
-    return post;
+    return newPost;
   }
 
-  deletePost(postId: number) {
+  async deletePost(postId: number) {
     // id에 해당하는 post 없을 경우 에러 처리
-    const post = posts.find((post) => post.id === postId);
+    const post = await this.postsRepository.findOne({
+      where: {
+        id: postId,
+      },
+    });
 
     if (!post) {
       throw new NotFoundException(); // nestjs에서 기본으로 제공하는 error type
     }
-    posts = posts.filter((post) => post.id !== postId);
+
+    await this.postsRepository.delete(postId);
 
     return postId;
   }
