@@ -11,48 +11,48 @@ import { PostsModel } from './entities/posts.entity';
  * commentCount: number
  */
 
-export interface PostModel {
-  id: number;
-  author: string;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-}
+// export interface PostModel {
+//   id: number;
+//   author: string;
+//   title: string;
+//   content: string;
+//   likeCount: number;
+//   commentCount: number;
+// }
 
-let posts: PostModel[] = [
-  {
-    id: 1,
-    author: 'newjeans_official',
-    title: '민지',
-    content: '민지 짱이쁜',
-    likeCount: 101010,
-    commentCount: 20202,
-  },
-  {
-    id: 2,
-    author: 'newjeans_official',
-    title: '해린',
-    content: '해린 짱이쁜',
-    likeCount: 101010,
-    commentCount: 20202,
-  },
-  {
-    id: 3,
-    author: 'newjeans_official',
-    title: '하니',
-    content: '하니 짱이쁜',
-    likeCount: 101010,
-    commentCount: 20202,
-  },
-];
+// let posts: PostModel[] = [
+//   {
+//     id: 1,
+//     author: 'newjeans_official',
+//     title: '민지',
+//     content: '민지 짱이쁜',
+//     likeCount: 101010,
+//     commentCount: 20202,
+//   },
+//   {
+//     id: 2,
+//     author: 'newjeans_official',
+//     title: '해린',
+//     content: '해린 짱이쁜',
+//     likeCount: 101010,
+//     commentCount: 20202,
+//   },
+//   {
+//     id: 3,
+//     author: 'newjeans_official',
+//     title: '하니',
+//     content: '하니 짱이쁜',
+//     likeCount: 101010,
+//     commentCount: 20202,
+//   },
+// ];
 
 @Injectable()
 export class PostsService {
   constructor(
     // typeorm으로부터 주입받은 모델이다라는 의미로 @InjectRepository 사용
     @InjectRepository(PostsModel)
-    private readonly postsRepository: Repository<PostModel>,
+    private readonly postsRepository: Repository<PostsModel>,
     // postsRepository라는 파라미터 생성: 타입<모델이름>
   ) {}
 
@@ -76,12 +76,14 @@ export class PostsService {
     return post;
   }
 
-  async createPost(author: string, title: string, content: string) {
+  async createPost(authorId: number, title: string, content: string) {
     // 1) create -> 저장할 객체 생성
     // 2) save -> 객체 저장 (create 매서드에서 생성한 객체로)
 
     const post = this.postsRepository.create({
-      author,
+      author: {
+        id: authorId,
+      },
       title,
       content,
       likeCount: 0,
@@ -93,12 +95,7 @@ export class PostsService {
     return newPost;
   }
 
-  async updatePost(
-    postId: number,
-    author: string,
-    title: string,
-    content: string,
-  ) {
+  async updatePost(postId: number, title: string, content: string) {
     // save의 기능
     // 1. 만약에 데이터가 존재하지 않는다면 (id 기준으로) 새로 생성
     // 2. 만약에 데이터가 존재한다면 (같은 id의 값이 존재한다면) 존재하던 값을 업데이트함
@@ -113,9 +110,10 @@ export class PostsService {
       throw new NotFoundException();
     }
 
-    if (author) {
-      post.author = author;
-    }
+    // 삭제 => 어차피 알아서 입력됨
+    // if (author) {
+    //   post.author = author;
+    // }
 
     if (title) {
       post.title = title;
