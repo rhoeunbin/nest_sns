@@ -58,7 +58,10 @@ export class PostsService {
 
   // Find 함수로 다수의 데이터 가져오기
   async getAllPosts() {
-    return this.postsRepository.find();
+    return this.postsRepository.find({
+      // author의 내용도 조회하기 위해 relations 추가
+      relations: ['author'],
+    });
   }
 
   // FindOne 함수 이용해서 하나의 데이터만 찾기
@@ -67,6 +70,7 @@ export class PostsService {
       where: {
         id,
       },
+      relations: ['author'],
     });
 
     if (!post) {
