@@ -72,6 +72,7 @@ export class AuthService {
      * 2) 기존 해시 (hash) -> 사용자 정보에 저장돼있는 hash
      */
     const passOk = await bcrypt.compare(user.password, existingUser.password);
+
     if (!passOk) {
       throw new UnauthorizedException('비밀번호가 틀렸습니다');
     }
@@ -82,5 +83,17 @@ export class AuthService {
     const existingUser = await this.authenticateWithEmailAndPassword(user);
 
     return this.loginUser(existingUser);
+  }
+
+  async registerWithEmail(
+    user: Pick<UsersModel, 'nickname' | 'email' | 'password'>,
+  ) {
+    const hash = await bcrypt.hash(user.password, HASH_ROUNDS);
+    const newUser = await this.usersService.createUser({
+      ...user,
+      password: hash,
+    });
+
+    return this.loginUser(newUser);
   }
 }
