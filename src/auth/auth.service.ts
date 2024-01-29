@@ -52,6 +52,27 @@ export class AuthService {
    */
 
   /**
+   * Header로부터 토큰을 받을 때
+   * {authorization: 'Basic {token}'}
+   * {authorization: 'Bearer {token}'}
+   */
+  async extractTokenFromHeader(header: string, isBearer: boolean) {
+    // 'Basic {token}'}
+    // [Basic, {token}]
+    // 'Bearer {token}'
+    // [Bearer, {token}]
+    const splitToken = header.split(' ');
+
+    const prefix = isBearer ? 'Bearer' : 'Basic';
+
+    if (splitToken.length !== 2 || splitToken[0] !== prefix) {
+      throw new UnauthorizedException('잘못된 토큰입니다');
+    }
+
+    const token = splitToken[1];
+  }
+
+  /**
    * payload에 들어갈 정보
    * 1) email
    * 2) sub -> 보통 사용자의 id
