@@ -99,6 +99,35 @@ export class AuthService {
     };
   }
 
+  // 토큰 검증
+  verifyToken(token: string) {
+    return this.jwtService.verify(token, {
+      secret: JWT_SECRET,
+    });
+  }
+
+  // 토큰이 만료된 뒤에 refreshtoken 던져주기
+  rotateToken(token: string, isRefreshToken: boolean) {
+    const decoded = this.jwtService.verify(token, {
+      secret: JWT_SECRET,
+    });
+    /**
+     * sub:id
+     * email: email
+     * type: 'access' | 'refresh'
+     */
+    if (decoded.type !== 'refresh') {
+      throw new UnauthorizedException('토큰 재발급은 refresh 토큰으로만 가능');
+    }
+    // true면 refresh token, false면 access token
+    return this.signToken(
+      {
+        ...decoded,
+      },
+      isRefreshToken,
+    );
+  }
+
   /**
    * payload에 들어갈 정보
    * 1) email
