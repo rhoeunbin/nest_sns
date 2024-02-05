@@ -8,12 +8,10 @@ import {
 } from 'typeorm';
 import { RolesEnum } from '../const/roles.const';
 import { PostsModel } from 'src/posts/entities/posts.entity';
+import { BaseModel } from 'src/common/entity/base.entity';
 
 @Entity()
-export class UsersModel {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class UsersModel extends BaseModel {
   @Column({
     // 1) 길이가 20을 넘지 않을 것
     // 2) 유일무이한 값
@@ -38,10 +36,4 @@ export class UsersModel {
 
   @OneToMany(() => PostsModel, (post) => post.author)
   posts: PostsModel[];
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

@@ -1,3 +1,4 @@
+import { BaseModel } from 'src/common/entity/base.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
 import {
   Column,
@@ -8,10 +9,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class PostsModel {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class PostsModel extends BaseModel {
   // 1) usersModel과 연동 -> foreign key를 이용
   // 2) null이 될 수 없음
   @ManyToOne(() => UsersModel, (user) => user.posts, {
