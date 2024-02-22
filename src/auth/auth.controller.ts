@@ -13,12 +13,17 @@ import {
   PasswordPipe,
 } from './pipe/password.pipe';
 import { BasicTokenGuard } from './guard/basic-token.guard';
+import {
+  AccessTokenGuard,
+  RefreshTokenGuard,
+} from './guard/bearer-token.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('token/access')
+  @UseGuards(RefreshTokenGuard)
   postTokenAccess(@Headers('authorization') rawToken: string) {
     const token = this.authService.extractTokenFromHeader(rawToken, true);
 
@@ -30,6 +35,7 @@ export class AuthController {
   }
 
   @Post('token/refresh')
+  @UseGuards(RefreshTokenGuard)
   postTokenRefresh(@Headers('authorization') rawToken: string) {
     const token = this.authService.extractTokenFromHeader(rawToken, true);
 
@@ -42,7 +48,7 @@ export class AuthController {
 
   @Post('login/email')
   @UseGuards(BasicTokenGuard)
-  postLoginEmail(@Headers('authorization') rawToken: string, @Request() req) {
+  postLoginEmail(@Headers('authorization') rawToken: string) {
     // email:password -> base64
     const token = this.authService.extractTokenFromHeader(rawToken, false);
 
