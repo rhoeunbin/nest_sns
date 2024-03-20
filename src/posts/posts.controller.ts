@@ -15,6 +15,7 @@ import { PostsService } from './posts.service';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { User } from 'src/users/decorator/user.decorator';
+import { createPostDto } from './dto/create-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -37,17 +38,20 @@ export class PostsController {
 
   // 3) POST /posts
   // post 생성
+
+  // DTO - Data Transfer Object
   @Post()
   @UseGuards(AccessTokenGuard)
   postPosts(
     // @Body('authorId') authorId: number,
     // @Request() req: any,
-    @User() user: UsersModel,
-    @Body('title') title: string,
-    @Body('content') content: string,
+    @User('id') userId: number,
+    @Body() body: createPostDto,
+    // @Body('title') title: string,
+    // @Body('content') content: string,
   ) {
     // const authorId = req.user.id;
-    return this.postsService.createPost(user.id, title, content);
+    return this.postsService.createPost(userId, body);
   }
 
   // 4) Patch /posts/:id

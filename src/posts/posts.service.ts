@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostsModel } from './entities/posts.entity';
+import { createPostDto } from './dto/create-post.dto';
 
 /**
  * author: string
@@ -80,7 +81,7 @@ export class PostsService {
     return post;
   }
 
-  async createPost(authorId: number, title: string, content: string) {
+  async createPost(authorId: number, postDto: createPostDto) {
     // 1) create -> 저장할 객체 생성
     // 2) save -> 객체 저장 (create 매서드에서 생성한 객체로)
 
@@ -88,8 +89,7 @@ export class PostsService {
       author: {
         id: authorId,
       },
-      title,
-      content,
+      ...postDto,
       likeCount: 0,
       commentCount: 0,
     });
